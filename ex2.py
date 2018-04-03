@@ -26,7 +26,7 @@ def main():
             if (y_hat != y):  # check if y_hat and tag are not equal
                 # we need to update w and b
                 for i in range(3):
-                    if i==y:
+                    if i+1==y:
                         loss_difrenzial_by_w = -xt + np.dot(softmax(y, w, xt, b), xt)
                         loss_difrenzial_by_b = -1 + softmax(y, w, xt, b)
                     else:
