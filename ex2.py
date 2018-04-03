@@ -18,24 +18,24 @@ def main():
         for xt in sampels:
             soft_max = 0
             y_hat = 0
-            for i in range(3):
+            for i in range(1,4):
                 optional_max = softmax(i, w, xt, b)  # i its optional tag we want to find the tag with the high probability for xt
                 if optional_max > soft_max:
                     soft_max = optional_max
                     y_hat = i
             if (y_hat != y):  # check if y_hat and tag are not equal
                 # we need to update w and b
-                for i in range(3):
-                    if i+1==y:
+                for i in range(1,4):
+                    if i==y:
                         loss_difrenzial_by_w = -xt + np.dot(softmax(y, w, xt, b), xt)
                         loss_difrenzial_by_b = -1 + softmax(y, w, xt, b)
                     else:
                         loss_difrenzial_by_w = np.dot(softmax(y, w, xt, b), xt)
                         loss_difrenzial_by_b = softmax(y, w, xt, b)
                     # update w
-                    w = w - np.dot(eta, loss_difrenzial_by_w)
+                    w[i-1] = w[i-1] - np.dot(eta, loss_difrenzial_by_w)
                     # update b
-                    b = b - np.dot(eta, loss_difrenzial_by_b)
+                    b[i-1] = b[i-1] - np.dot(eta, loss_difrenzial_by_b)
 
     print w
     print b
