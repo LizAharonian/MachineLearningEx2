@@ -28,19 +28,14 @@ def main():
                 for i in range(3):
                     if i==y:
                         loss_difrenzial_by_w = -xt + np.dot(softmax(y, w, xt, b), xt)
-                        # update w
-                        w = w - np.dot(eta, loss_difrenzial_by_w)
                         loss_difrenzial_by_b = -1 + softmax(y, w, xt, b)
-                        # update b
-                        b = b - np.dot(eta, loss_difrenzial_by_b)
                     else:
                         loss_difrenzial_by_w = np.dot(softmax(y, w, xt, b), xt)
-                        # update w
-                        w = w - np.dot(eta, loss_difrenzial_by_w)
                         loss_difrenzial_by_b = softmax(y, w, xt, b)
-                        # update b
-                        b = b - np.dot(eta, loss_difrenzial_by_b)
-
+                    # update w
+                    w = w - np.dot(eta, loss_difrenzial_by_w)
+                    # update b
+                    b = b - np.dot(eta, loss_difrenzial_by_b)
 
     print w
     print b
