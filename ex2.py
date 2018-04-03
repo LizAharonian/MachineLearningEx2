@@ -6,39 +6,58 @@ def main():
     main function.
     runs the program.
     """""
-    sampels_1 = create_sampels(1)
     w = [0,0,0]
     b = [0,0,0]
-    n = 1 #mekadem lemmida
-    for xt in sampels_1:
-        soft_max =0
-        y_hat = 0
-        sum = 0
-        # calculat the sum
-        for j in range(3):
-            sum += np.exp(np.dot(w[j],xt)+b[j])
+    eta = 1 #mekadem lemmida
+    #set of examples and tags
+    s ={1:create_sampels(1),2:create_sampels(2),3:create_sampels(3)}
+    for y in s.keys():
 
-        for i in range(3):
+        sampels = s[y]
 
-            optional_max = np.exp(np.dot(w[i],xt)+b[i])
-            if optional_max>soft_max:
-                soft_max = optional_max
-                y_hat =i
-        #if (y_hat !=1):#check if y_hat and tag are not equal
-            #we need to update w and b
+        for xt in sampels:
+            soft_max = 0
+            y_hat = 0
+            for i in range(3):
+                optional_max = softmax(i, w, xt, b)  # i its optional tag we want to find the tag with the high probability for xt
+                if optional_max > soft_max:
+                    soft_max = optional_max
+                    y_hat = i
+            if (y_hat != y):  # check if y_hat and tag are not equal
+                # we need to update w and b
+                for i in range(3):
+                    if i==y:
+                        loss_difrenzial_by_w = -xt + np.dot(softmax(y, w, xt, b), xt)
+                        # update w
+                        w = w - np.dot(eta, loss_difrenzial_by_w)
+                        loss_difrenzial_by_b = -1 + softmax(y, w, xt, b)
+                        # update b
+                        b = b - np.dot(eta, loss_difrenzial_by_b)
+                    else:
+                        loss_difrenzial_by_w = np.dot(softmax(y, w, xt, b), xt)
+                        # update w
+                        w = w - np.dot(eta, loss_difrenzial_by_w)
+                        loss_difrenzial_by_b = softmax(y, w, xt, b)
+                        # update b
+                        b = b - np.dot(eta, loss_difrenzial_by_b)
 
 
-
-
-
-
-
+    print w
+    print b
     print "liz"
 
 
 
 def create_sampels(a):
     return np.random.normal(2 * a, 1, 100)
+
+def softmax(a,w,xt,b):
+    # calculate the sum
+    sum = 0
+    for j in range(3):
+        sum += np.exp(np.dot(w[j], xt) + b[j])
+    return np.divide(np.exp(np.dot(w[a-1],xt)+b[a-1]),sum)
+
 
 
 if __name__ == '__main__':
