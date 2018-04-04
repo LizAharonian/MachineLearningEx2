@@ -25,15 +25,15 @@ def main():
             # we need to update w and b
         for i in range(1,4):
             if i==y:
-                loss_difrenzial_by_w = -xt + np.dot(softmax(y, w, xt, b), xt)
+                loss_difrenzial_by_w = -xt + softmax(y, w, xt, b)* xt
                 loss_difrenzial_by_b = -1 + softmax(y, w, xt, b)
             else:
-                loss_difrenzial_by_w = np.dot(softmax(y, w, xt, b), xt)
+                loss_difrenzial_by_w = softmax(y, w, xt, b)* xt
                 loss_difrenzial_by_b = softmax(y, w, xt, b)
             # update w
-            w[i-1] = w[i-1] - np.dot(eta, loss_difrenzial_by_w)
+            w[i-1] = w[i-1] - eta* loss_difrenzial_by_w
             # update b
-            b[i-1] = b[i-1] - np.dot(eta, loss_difrenzial_by_b)
+            b[i-1] = b[i-1] -eta* loss_difrenzial_by_b
     check(w,b)
 
     print w
@@ -49,8 +49,8 @@ def softmax(a,w,xt,b):
     # calculate the sum
     sum = 0
     for j in range(3):
-        sum += np.exp(np.dot(w[j], xt) + b[j])
-    return np.divide(np.exp(np.dot(w[a-1],xt)+b[a-1]),sum)
+        sum += np.exp(w[j]* xt + b[j])
+    return (np.exp(w[a-1]*xt+b[a-1]))/sum
 
 def get_y_hat(w, b,xt):
     for i in range(1, 4):
