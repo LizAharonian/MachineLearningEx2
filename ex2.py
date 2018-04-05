@@ -13,14 +13,13 @@ def main():
     w = [0,0,0]
     b = [0,0,0]
     # learning rate
-    eta = 0.3
+    eta = 0.1
     # set of examples and tags
     s =[]
     for tag in range(1,4):
         sampels = create_sampels(tag)
         for i in range(100):
             s.append((tag,sampels[i]))
-    np.random.shuffle(s)
     # train the algorithm
     (w,b) = training(s,eta,w,b)
     # test the algorithm
@@ -34,8 +33,8 @@ def training(s,eta,w,b):
     """""
     epochs = 20
     for e in range(epochs):
+        np.random.shuffle(s)
         for (y, xt) in s:
-            np.random.shuffle(s)
             # we need to update w and b
             for i in range(1, 4):
                 if i == y:
