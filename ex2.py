@@ -32,7 +32,7 @@ def training(s,eta,w,b):
     training function.
     updates w and b using loss function and softmax.
     """""
-    epochs = 10
+    epochs = 20
     for e in range(epochs):
         for (y, xt) in s:
             # we need to update w and b
@@ -59,12 +59,14 @@ def create_sampels(a):
 def softmax(a,w,xt,b):
     """""
     softmax function.
-    clculates the probability xt tag is a.
+    calculates the probability that xt's tag is a.
     """""
     # calculate the sum
     sum = 0
     for j in range(3):
         sum += np.exp(w[j] * xt + b[j])
+    if sum == 0:
+       return 0
     return (np.exp(w[a-1]*xt+b[a-1]))/sum
 
 def check(w,b):
