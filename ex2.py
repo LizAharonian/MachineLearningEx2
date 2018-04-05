@@ -10,7 +10,7 @@ def main():
     """""
     w = [0,0,0]
     b = [0,0,0]
-    eta = 1 #learning rate
+    eta = 0.1 #learning rate
     #set of examples and tags
     s =[]
     for tag in range(1,4):
@@ -62,10 +62,10 @@ def get_y_hat(w, b,xt):
 
 def check(w,b):
     dictSoftmax ={}
-    for xt in range(1,11):
+    for xt in range(0,10):
         dictSoftmax[xt] = softmax(1,w,xt,b)
     dictReal ={}
-    for xt in range(1,11):
+    for xt in range(0,10):
         dictReal[xt] = (density(2, xt)) / (density(2, xt) + density(4, xt) + density(6, xt))
     plt.plot(dictSoftmax.keys(), dictSoftmax.values(), "b-", label='Real')
     plt.plot(dictReal.keys(), dictReal.values(), "r-", label='Real')
