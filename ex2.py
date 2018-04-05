@@ -35,6 +35,7 @@ def training(s,eta,w,b):
     epochs = 20
     for e in range(epochs):
         for (y, xt) in s:
+            np.random.shuffle(s)
             # we need to update w and b
             for i in range(1, 4):
                 if i == y:
