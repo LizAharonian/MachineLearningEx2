@@ -55,6 +55,7 @@ def softmax(a,w,xt,b):
 
 def get_y_hat(w, b,xt):
     soft_max=0
+    y_hat=1
     for i in range(1, 4):
         optional_max = softmax(i, w, xt,  b)  # i its optional tag we want to find the tag with the high probability for xt
         if optional_max > soft_max:
@@ -65,7 +66,7 @@ def get_y_hat(w, b,xt):
 def check(w,b):
     dictSoftmax ={}
     for xt in range(0,10):
-        dictSoftmax[xt] = softmax(1,w,xt,b)/(softmax(1,w,xt,b)+softmax(2,w,xt,b)+softmax(3,w,xt,b))
+        dictSoftmax[xt] = softmax(1,w,xt,b)#/(softmax(1,w,xt,b)+softmax(2,w,xt,b)+softmax(3,w,xt,b))
         print str(xt) +" "+str(get_y_hat(w,b,xt))
     dictReal ={}
     for xt in range(0,10):
