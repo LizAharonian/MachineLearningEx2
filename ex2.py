@@ -75,10 +75,10 @@ def check(w,b):
     creates 10 examples and plots their probability to be belong to 1 normal dist.
     """""
     dictSoftmax ={}
-    for xt in range(0,10):
+    for xt in range(0,11):
         dictSoftmax[xt] = softmax(1,w,xt,b)
     dictReal ={}
-    for xt in range(0,10):
+    for xt in range(0,11):
         dictReal[xt] = (density(2, xt)) / (density(2, xt) + density(4, xt) + density(6, xt))
     label1, =plt.plot(dictSoftmax.keys(), dictSoftmax.values(), "b-", label='Softmax Distribution')
     label2, =plt.plot(dictReal.keys(), dictReal.values(), "r-", label='Real normal Distribution')
