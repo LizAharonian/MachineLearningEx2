@@ -1,20 +1,17 @@
 import numpy as np
 import pickle
-sigmoid = lambda x: 1 / (1 + np.exp(-x))
+
 
 def main():
 
-
+    #load set of examples
     train_x = np.loadtxt("train_x")
     train_y = np.loadtxt("train_y")
     test_x = np.loadtxt("test_x")
     print "collected"
 
-    # shuffle the training set
-    shape = np.arange(train_x.shape[0])
-    np.random.shuffle(shape)
-    train_x = train_x[shape]
-    train_y = train_y[shape]
+    #shuffle the training set
+    (train_x,train_y) = shuffle(train_x,train_y)
 
     #split to val_set and train_set
     val_size = int(len(train_x) *0.2)
@@ -22,6 +19,7 @@ def main():
     val_y = train_y[-val_size:]
     train_x = train_x[: -val_size, :]
     train_y = train_y[: -val_size]
+
     #help params
     prob_dimend = 784 #num of picksels in pic
 
@@ -39,8 +37,8 @@ def main():
     #train the model
     train(params,epochs,sigmoid,eta,train_x,train_y,val_x,val_y)
 
-    x = np.random.rand(2, 1)
-    y = np.random.randint(0, 2)  # Returns 0/1
+   # x = np.random.rand(2, 1)
+   # y = np.random.randint(0, 2)  # Returns 0/1
 
     fprop_cache = fprop(x, y, params)
     bprop_cache = bprop(fprop_cache)
@@ -81,32 +79,56 @@ def main():
 def shuffle(x_arr,y_arr):
     shape = np.arange(x_arr.shape[0])
     np.random.shuffle(shape)
-    train_x = x_arr[shape]
-    train_y = y_arr[shape]
+    x_arr = x_arr[shape]
+    y_arr = y_arr[shape]
+    return (x_arr,y_arr)
+
+def sigmoid(x):
+    return np.divide(1, (1 + np.exp(-x)))
 
 def train(params,epochs,active_func,eta,train_x, train_y, val_x,val_y):
     for i in xrange(epochs):
-        shuffle(train_x, train_y)
+        (train_x, train_y)=shuffle(train_x, train_y)
+        for x,y in zip(train_x,train_y):
+            softmax = fprop(params,active_func,x)
+
 
         print "train"
 
-if __name__ == '__main__':
-    main()
 
 
+def softmax(w,xt,b):
+    """""
+    softmax function.
+    calculates the probability that xt's tag is a.
+    """""
+    # calculate the sum
+    sum = 0
+    for j in range(10):
+        la = np.dot(w[j], xt)
+        sum += np.exp(np.dot(w[j], xt) + b[j])
 
-def fprop(x, y, params):
-  # Follows procedure given in notes
-  W1, b1, W2, b2 = [params[key] for key in ('W1', 'b1', 'W2', 'b2')]
-  z1 = np.dot(W1, x) + b1
-  h1 = sigmoid(z1)
-  z2 = np.dot(W2, h1) + b2
-  h2 = sigmoid(z2)
-  loss = -(y * np.log(h2) + (1-y) * np.log(1-h2))
-  ret = {'x': x, 'y': y, 'z1': z1, 'h1': h1, 'z2': z2, 'h2': h2, 'loss': loss}
-  for key in params:
-    ret[key] = params[key]
-  return ret
+    softmax_vec =[]
+    for i in range(10):
+        num =np.dot(w[i],xt)
+        softmax_vec.append((np.exp(np.dot(w[i],xt)+b[i]))/sum)
+
+    return softmax_vec
+
+def fprop(params,active_function,x):
+    # Follows procedure given in notes
+    W1, b1, W2, b2 = [params[key] for key in ('W1', 'b1', 'W2', 'b2')]
+    z1 = np.dot(W1, np.transpose(x)) + b1
+    h1 = active_function(z1)
+    z2 = np.dot(W2, h1) + b2
+    # h2 = active_function(z2)
+    return softmax(W2,h1,b2)
+
+  #loss = -(y * np.log(h2) + (1-y) * np.log(1-h2))
+  #ret = {'x': x, 'y': y, 'z1': z1, 'h1': h1, 'z2': z2, 'h2': h2, 'loss': loss}
+  #for key in params:
+  #  ret[key] = params[key]
+  #return ret
 
 def bprop(fprop_cache):
   # Follows procedure given in notes
@@ -120,3 +142,5 @@ def bprop(fprop_cache):
   db1 = dz1                                     #  dL/dz2 * dz2/dh1 * dh1/dz1 * dz1/db1
   return {'b1': db1, 'W1': dW1, 'b2': db2, 'W2': dW2}
 
+if __name__ == '__main__':
+    main()
