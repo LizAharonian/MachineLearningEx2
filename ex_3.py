@@ -5,9 +5,16 @@ import pickle
 def main():
 
     #load set of examples
-    train_x = np.loadtxt("train_x")
-    train_y = np.loadtxt("train_y")
-    test_x = np.loadtxt("test_x")
+    #todo:change back to normal reading
+    train_x = np.load("train_x.bin.npy")
+    #np.save("train_x.bin",train_x)
+    train_y = np.load("train_y.bin.npy")
+    #np.save("train_y.bin",train_y)
+
+    test_x = np.load("test_x.bin.npy")
+    #np.save("test_x.bin",test_x)
+
+
     print "collected"
 
     #shuffle the training set
