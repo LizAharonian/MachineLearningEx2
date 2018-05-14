@@ -14,6 +14,10 @@ def main():
     test_x = np.load("test_x.bin.npy")
     #np.save("test_x.bin",test_x)
 
+    #normalization
+    train_x=np.divide(train_x,255)
+    test_x = np.divide(test_x,255)
+
 
     print "collected"
 
@@ -27,6 +31,9 @@ def main():
     train_x = train_x[: -val_size, :]
     train_y = train_y[: -val_size]
 
+    train_x=train_x/255
+    test_x=test_x/255
+
     #help params
     prob_dimend = 784 #num of picksels in pic
 
@@ -36,9 +43,9 @@ def main():
     eta = 0.1
 
     W1 = np.random.rand(H, prob_dimend)
-    b1 = np.random.rand(H, 1)
+    b1 = np.random.rand(H)
     W2 = np.random.rand(10, H)
-    b2 = np.random.rand(10, 1)
+    b2 = np.random.rand(10)
     params = {'W1': W1, 'b1': b1, 'W2': W2, 'b2': b2}
 
     #train the model
@@ -93,11 +100,21 @@ def shuffle(x_arr,y_arr):
 def sigmoid(x):
     return np.divide(1, (1 + np.exp(-x)))
 
+def loss(y_hat):
+    return -np.log(y_hat);
+
+
 def train(params,epochs,active_func,eta,train_x, train_y, val_x,val_y):
     for i in xrange(epochs):
+        sum_loss = 0
         (train_x, train_y)=shuffle(train_x, train_y)
         for x,y in zip(train_x,train_y):
             softmax = fprop(params,active_func,x)
+            y_hat = softmax[y]
+            loss = loss(y_hat)
+            sum_loss+=loss
+
+
 
 
         print "train"
@@ -115,21 +132,38 @@ def softmax(w,xt,b):
         la = np.dot(w[j], xt)
         sum += np.exp(np.dot(w[j], xt) + b[j])
 
-    softmax_vec =[]
+    softmax_vec =np.zeros((10,1))
     for i in range(10):
         num =np.dot(w[i],xt)
-        softmax_vec.append((np.exp(np.dot(w[i],xt)+b[i]))/sum)
+        softmax_vec[i]=(np.exp(np.dot(w[i],xt)+b[i]))/sum
+
 
     return softmax_vec
 
 def fprop(params,active_function,x):
     # Follows procedure given in notes
     W1, b1, W2, b2 = [params[key] for key in ('W1', 'b1', 'W2', 'b2')]
-    z1 = np.dot(W1, np.transpose(x)) + b1
+    print x
+    x = np.transpose(x)
+    print x
+    z1 = np.dot(W1, x) + b1
     h1 = active_function(z1)
     z2 = np.dot(W2, h1) + b2
-    # h2 = active_function(z2)
+    h2 = active_function(z2)
     return softmax(W2,h1,b2)
+    # we need to update w and b
+    for i in range(1, 4):
+        if i == y:
+            loss_difrenzial_by_w = -xt + softmax(i, w, xt, b) * xt
+            loss_difrenzial_by_b = -1 + softmax(i, w, xt, b)
+        else:
+            loss_difrenzial_by_w = softmax(i, w, xt, b) * xt
+            loss_difrenzial_by_b = softmax(i, w, xt, b)
+        # update w
+        w[i - 1] = w[i - 1] - eta * loss_difrenzial_by_w
+        # update b
+        b[i - 1] = b[i - 1] - eta * loss_difrenzial_by_b
+
 
   #loss = -(y * np.log(h2) + (1-y) * np.log(1-h2))
   #ret = {'x': x, 'y': y, 'z1': z1, 'h1': h1, 'z2': z2, 'h2': h2, 'loss': loss}
