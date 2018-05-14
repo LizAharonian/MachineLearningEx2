@@ -14,11 +14,6 @@ def main():
     test_x = np.load("test_x.bin.npy")
     #np.save("test_x.bin",test_x)
 
-    #normalization
-    #train_x=np.divide(train_x,255)
-    #test_x = np.divide(test_x,255)
-
-
     print "collected"
 
     #shuffle the training set
@@ -30,7 +25,7 @@ def main():
     val_y = train_y[-val_size:]
     train_x = train_x[: -val_size, :]
     train_y = train_y[: -val_size]
-
+    #normalization
     train_x=train_x/255
     test_x=test_x/255
 
@@ -38,9 +33,9 @@ def main():
     prob_dimend = 784 #num of picksels in pic
 
     #hyper paramemters
-    H = 20   #size of hidden layer
-    epochs = 10
-    eta = 0.1
+    H = 100   #size of hidden layer
+    epochs = 100
+    eta = 0.01
 
     W1 = np.random.rand(H, prob_dimend)
     b1 = np.random.rand(H,1)
@@ -68,7 +63,33 @@ def loss_func(y_prob):
     return -np.log(y_prob)
 
 def validation(params, active_func, val_x,val_y):
+    sum_loss =0
+    num_of_success = 0
+    for x,y in zip(val_x,val_y):
+        x = np.reshape(x, (1, 784))
+        (fprop_cache, params) = fprop(params, active_func, x, y)
+        y_prob = (fprop_cache['softmax'])[int(y)][0]
+        loss = loss_func(y_prob)
+        sum_loss += loss
+        y_hat = argmax_i(fprop_cache['softmax'])
+        if (y == y_hat):
+           # print "yess!"
+            num_of_success+=1
+    accurate = num_of_success / float(np.shape(val_x)[0])
+    average_loss = sum_loss /np.shape(val_x)[0]
+    return average_loss,accurate
+
+
     print "val"
+
+def argmax_i(softmax):
+    max = softmax[0][0]
+    ret = 0
+    for i in range(10):
+        if (softmax[i][0] > max):
+            max = softmax[i][0]
+            ret =i
+    return ret
 
 def train(params,epochs,active_func,eta,train_x, train_y, val_x,val_y):
     for i in xrange(epochs):
@@ -85,7 +106,8 @@ def train(params,epochs,active_func,eta,train_x, train_y, val_x,val_y):
             params = update_params(params, eta,bprop_cache)
 
 
-
+        val_loss, accurate = validation(params,active_func,val_x,val_y)
+        print i , sum_loss/np.shape(train_x)[0], val_loss,accurate*100
 
         print "train"
 
