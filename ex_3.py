@@ -2,6 +2,12 @@ import numpy as np
 
 
 def main():
+    """""
+    main function.
+    runs the program.
+    implement of NN.
+    
+    """""
 
     #train_x = np.loadtxt("train_x")
     #train_y = np.loadtxt("train_y")
@@ -19,7 +25,7 @@ def main():
     #np.save("test_x.bin",test_x)
 
     print "collected"
-    # *******************************************
+# *******************************************
 
     #shuffle the training set
     (train_x,train_y) = shuffle(train_x,train_y)
@@ -36,22 +42,24 @@ def main():
     test_x=test_x/255
 
     #help params
-    prob_dimend = 784 #num of picksels in pic
+    prob_dimend = 784   #num of picksels in pic
 
     #hyper paramemters
-    H = 100  #size of hidden layer
+    H = 100             #size of hidden layer
     epochs = 50
     eta = 0.005
 
+    #initialize params
     W1 = np.random.uniform(-0.08,0.08,[H, prob_dimend])
     b1 = np.random.uniform(-0.08,0.08,[H,1])
     W2 = np.random.uniform(-0.08,0.08,[10, H])
     b2 = np.random.uniform(-0.08,0.08,[10,1])
     params = {'W1': W1, 'b1': b1, 'W2': W2, 'b2': b2}
 
-    #train the model
+    #train the model + validation
     params = train(params,epochs,sigmoid,eta,train_x,train_y,val_x,val_y)
 
+    #save test.pred
     pred_file = open("test.pred", 'w')
     for x in test_x:
         x = np.reshape(x, (1, prob_dimend))
@@ -61,9 +69,12 @@ def main():
     pred_file.close()
 
 
-    print "liz"
-
 def shuffle(x_arr,y_arr):
+    """""
+    shuffle function.
+    shuffles the arrays togther
+    
+    """""
     shape = np.arange(x_arr.shape[0])
     np.random.shuffle(shape)
     x_arr = x_arr[shape]
@@ -71,13 +82,28 @@ def shuffle(x_arr,y_arr):
     return (x_arr,y_arr)
 
 def sigmoid(x):
+    """""
+    sigmoid function.
+    convert x to number between 0 and 1
+
+    """""
     return np.divide(1, (1 + np.exp(-x)))
-    #return (np.exp(x - np.amax(x))/(np.sum(np.exp(x - np.amax(x)))))
 
 def loss_func(y_prob):
+    """""
+    loss_func function.
+    calculates the loss
+
+    """""
     return -np.log(y_prob)
 
 def validation(params, active_func, val_x,val_y):
+    """""
+    validation function.
+    runs on validation arrays.
+    update rull is not performed here.
+
+    """""
     sum_loss =0
     num_of_success = 0
     for x,y in zip(val_x,val_y):
@@ -86,37 +112,25 @@ def validation(params, active_func, val_x,val_y):
         y_prob = (fprop_cache['softmax'])[int(y)][0]
         loss = loss_func(y_prob)
         sum_loss += loss
-
         y_hat = fprop_cache['softmax'].argmax(axis=0)
-
-
-        #y_hat = argmax_i(fprop_cache['softmax'])
         if (y == y_hat[0]):
-           # print "yess!"
             num_of_success+=1
     accurate = num_of_success / float(np.shape(val_x)[0])
     average_loss = sum_loss /np.shape(val_x)[0]
     return average_loss,accurate
 
-
-    print "val"
-
-def argmax_i(softmax):
-    max = softmax[0][0]
-    ret = 0
-    for i in range(10):
-        if (softmax[i][0] > max):
-            max = softmax[i][0]
-            ret =i
-    return ret
-
 def train(params,epochs,active_func,eta,train_x, train_y, val_x,val_y):
+    """""
+    train function.
+    trains our model and update the params.
+    in addition i perform validation after each epoch
+
+    """""
     for i in xrange(epochs):
         sum_loss = 0
         (train_x, train_y)=shuffle(train_x, train_y)
         for x,y in zip(train_x,train_y):
             x = np.reshape(x,(1,784))
-            #print np.shape(x)
             (fprop_cache,params) = fprop(params,active_func,x,y)
             y_prob = (fprop_cache['softmax'])[int(y)][0]
             loss = loss_func(y_prob)
@@ -124,14 +138,18 @@ def train(params,epochs,active_func,eta,train_x, train_y, val_x,val_y):
             bprop_cache = bprop(fprop_cache)
             params = update_params(params, eta,bprop_cache)
 
-
+        #perform validation
         val_loss, accurate = validation(params,active_func,val_x,val_y)
         print i , sum_loss/np.shape(train_x)[0], val_loss,accurate*100
-
-        print "train"
     return params
 
+
 def update_params(params, eta,bprop_cache):
+    """""
+    update_params function.
+    update the params by GD update rule
+
+    """""
     W1, b1, b2, W2 = [params[key] for key in ('W1', 'b1', 'b2','W2')]
     db1, dW1, db2, dW2 = [bprop_cache[key] for key in ('db1', 'dW1', 'db2', 'dW2')]
     W1 = W1 -eta *dW1
@@ -148,8 +166,6 @@ def softmax(w,xt,b):
     calculates the probability that xt's tag is a.
     """""
     # calculate the sum
-    #z = np.dot(w,xt)+b
-    #return (np.exp(z - np.amax(z)) / (np.sum(np.exp(z - np.amax(z)))))
     sum = 0
     for j in range(10):
         sum += np.exp(np.dot(w[j], xt) + b[j])
@@ -158,10 +174,14 @@ def softmax(w,xt,b):
     for i in range(10):
         softmax_vec[i]=(np.exp(np.dot(w[i],xt)+b[i]))/sum
 
-
     return softmax_vec
 
 def fprop(params,active_function,x,y):
+    """""
+    fprop function.
+    calculates the NN relevant params
+
+    """""
     # Follows procedure given in notes
     W1, b1, W2, b2 = [params[key] for key in ('W1', 'b1', 'W2', 'b2')]
     x = np.transpose(x)
@@ -175,24 +195,24 @@ def fprop(params,active_function,x,y):
 
 
 def bprop(fprop_cache):
-  # Follows procedure given in notes
-  x, y, z1, h1, z2, softmax = [fprop_cache[key] for key in ('x', 'y', 'z1', 'h1', 'z2', 'softmax')]
-  y_vec = np.zeros((10,1))
-  y_vec[int(y)] =1
-  y = y_vec
-  dz2 = (softmax - y)                                #  dL/dz2
-  dW2 = np.dot(dz2, h1.T)                       #  dL/dz2 * dz2/dw2
-  db2 = dz2                                     #  dL/dz2 * dz2/db2
-  # dz1 = np.dot(np.dot(fprop_cache['W2'].T,
-  #                 (softmax - y)), np.dot(sigmoid(z1).T, (1 - sigmoid(z1))))  # dL/dz2 * dz2/dh1 * dh1/dz1
-  # dW1 = np.dot(dz1, x.T)  #  dL/dz2 * dz2/dh1 * dh1/dz1 * dz1/dw1
-
-  dz1 = np.dot(fprop_cache['W2'].T,
+    """""
+    bprop function.
+    calculates the gradients
+  
+    """""
+    # Follows procedure given in notes
+    x, y, z1, h1, z2, softmax = [fprop_cache[key] for key in ('x', 'y', 'z1', 'h1', 'z2', 'softmax')]
+    y_vec = np.zeros((10,1))
+    y_vec[int(y)] =1
+    y = y_vec
+    dz2 = (softmax - y)                                #  dL/dz2
+    dW2 = np.dot(dz2, h1.T)                       #  dL/dz2 * dz2/dw2
+    db2 = dz2                                     #  dL/dz2 * dz2/db2
+    dz1 = np.dot(fprop_cache['W2'].T,
                (softmax - y)) * sigmoid(z1) * (1 - sigmoid(z1))  # dL/dz2 * dz2/dh1 * dh1/dz1
-  dW1 = np.dot(dz1, x.T)  # dL/dz2 * dz2/dh1 * dh1/dz1 * dz1/dw1
-
-  db1 = dz1                                     #  dL/dz2 * dz2/dh1 * dh1/dz1 * dz1/db1
-  return {'db1': db1, 'dW1': dW1, 'db2': db2, 'dW2': dW2}
+    dW1 = np.dot(dz1, x.T)                        # dL/dz2 * dz2/dh1 * dh1/dz1 * dz1/dw1
+    db1 = dz1                                     #  dL/dz2 * dz2/dh1 * dh1/dz1 * dz1/db1
+    return {'db1': db1, 'dW1': dW1, 'db2': db2, 'dW2': dW2}
 
 if __name__ == '__main__':
     main()
