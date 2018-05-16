@@ -46,7 +46,7 @@ def main():
 
     #hyper paramemters
     H = 100             #size of hidden layer
-    epochs = 50
+    epochs = 35
     eta = 0.005
 
     #initialize params
