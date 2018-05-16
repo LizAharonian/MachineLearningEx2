@@ -9,23 +9,9 @@ def main():
     
     """""
 
-    #train_x = np.loadtxt("train_x")
-    #train_y = np.loadtxt("train_y")
-    #test_x = np.loadtxt("test_x")
-
-#*******************************************
-    #load set of examples
-    #todo:change back to normal reading
-    train_x = np.load("train_x.bin.npy")
-    #np.save("train_x.bin",train_x)
-    train_y = np.load("train_y.bin.npy")
-    #np.save("train_y.bin",train_y)
-
-    test_x = np.load("test_x.bin.npy")
-    #np.save("test_x.bin",test_x)
-
-    print "collected"
-# *******************************************
+    train_x = np.loadtxt("train_x")
+    train_y = np.loadtxt("train_y")
+    test_x = np.loadtxt("test_x")
 
     #shuffle the training set
     (train_x,train_y) = shuffle(train_x,train_y)
@@ -138,9 +124,8 @@ def train(params,epochs,active_func,eta,train_x, train_y, val_x,val_y):
             bprop_cache = bprop(fprop_cache)
             params = update_params(params, eta,bprop_cache)
 
-        #perform validation
+        #preform validation
         val_loss, accurate = validation(params,active_func,val_x,val_y)
-        print i , sum_loss/np.shape(train_x)[0], val_loss,accurate*100
     return params
 
 
